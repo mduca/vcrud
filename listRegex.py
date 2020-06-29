@@ -12,6 +12,6 @@ user_input = input()
 for word_list in (create, read, update, delete):
     for word in word_list:
         # Search through user input for word
-        if re.search(word, user_input):
+        if re.search(word, user_input, flags=re.IGNORECASE):
             # Index 0 is the name of the list
             print("Match found in", word_list[0], "list!") 
