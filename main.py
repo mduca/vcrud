@@ -60,7 +60,7 @@ def udpate_contact(old_name,new_name,phone_number):
     contacts[new_name] = {'phone_number':phone_number,'name':new_name}
 
 def contact_list():
-    global contacts
+    contacts = session.query(Contact).all()
     return contacts
 
 def get_contact_by_name(name):
@@ -115,7 +115,7 @@ def cancel_and_root():
     say("No Problem!")
 
 def show_list_of_contacts():
-    contacts = session.query(Contact).all()
+    contacts = contact_list()
 
     if len(contacts) == 1:
         say("There is one contact")
