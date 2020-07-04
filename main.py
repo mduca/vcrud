@@ -53,7 +53,7 @@ def udpate_contact(old_name,new_name,phone_number):
     contacts[new_name] = {'phone_number':phone_number,'name':new_name}
 
 def contact_list():
-    global 
+    global contacts
     contacts = session.query(Contact).all()
     return contacts
 
@@ -139,10 +139,10 @@ def main():
     states['ROOT'] = {'GREET':greet_root}
     states['ROOT']['TRANSITIONS'] = []
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['create','set','add'],'DESTINATION':'CREATE'})
-    states['ROOT']['TRANSITIONS'].append({'REGEXEN':['read', 'show', 'get'],'DESTINATION':'READ'})
+    states['ROOT']['TRANSITIONS'].append({'REGEXEN':['read', 'show', 'get', 'list'],'DESTINATION':'READ'})
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['update', 'replace'],'DESTINATION':'UPDATE'})
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['delete','remove'],'DESTINATION':'DELETE'})
-    states['ROOT']['TRANSITIONS'].append({'REGEXEN':['quit','exit'],'DESTINATION':'EXIT'})
+    states['ROOT']['TRANSITIONS'].append({'REGEXEN':['quit','exit', 'bye', 'goodbye'],'DESTINATION':'EXIT'})
     
     states['EXIT'] = {'GREET':save_and_exit}
     states['EXIT']['TRANSITIONS'] = []
