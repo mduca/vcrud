@@ -75,24 +75,24 @@ def greet_root():
 
 def prompt_for_phone_number():
     say("Please provide a phone number for the new contact:") # todo: randomize
-    # say("Please provide a phone number")
-    # say("Please provide a number")
-    # say("Provide a number")
-    # say("What is the phone number")
+    # "Please provide a phone number"
+    # "Please provide a number"
+    # "Provide a number"
+    # "What is the phone number"
 
 def prompt_for_name():
     say("Please provide a name for the new contact:")
-    # say("Please provide a name:")
-    # say("Please provide a name for the contact:")
-    # say("Provide a name:")
+    # "Please provide a name:"
+    # "Please provide a name for the contact:"
+    # "Provide a name:"
 
 def save_and_exit():
     # todo save to db
     # store the full state
     say("Bye bye!")
-    # say("Quitting")
-    # say("Our time has come to and end")
-    # say("See you next time")
+    # "Quitting"
+    # "Our time has come to and end"
+    # "See you next time"
     sys.exit(0)
 
 def create_success():
