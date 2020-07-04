@@ -1,1 +1,2 @@
-CREATE TABLE CONTACTS ([id] INTEGER PRIMARY KEY,[Name] text, [Number] integer, [Date] date)
+-- CREATE TABLE CONTACTS ([id] INTEGER PRIMARY KEY,[Name] text, [Number] integer, [created_at] TEXT DEFAULT CURRENT_TIMESTAMP, [updated_at] TEXT DEFAULT CURRENT_TIMESTAMP)
+CREATE TABLE CONTACTS ([id] INTEGER PRIMARY KEY,[name] text, [number] integer, [date] TEXT DEFAULT CURRENT_TIMESTAMP)
