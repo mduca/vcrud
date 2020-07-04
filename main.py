@@ -1,4 +1,3 @@
-# given a list of lists of regexen indentify which list was chosen by the user given some user input in python.
 import re
 import sys
 from pprint import pprint
@@ -9,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 
-# DB initilzation 
+# Setup ORM withh contacts DB 
 engine = create_engine('sqlite:///./contacts.db', echo=True)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -33,12 +32,6 @@ def today():
     date = datetime.now().replace(microsecond=0).isoformat().replace('T',' ')
     return date
 
-
-
-
-# contact = Contact(name="John Doe", number='555-555-9111', date=date)
-# session.add(contact)
-# session.commit()
 #
 # contact api
 
@@ -60,6 +53,7 @@ def udpate_contact(old_name,new_name,phone_number):
     contacts[new_name] = {'phone_number':phone_number,'name':new_name}
 
 def contact_list():
+    global 
     contacts = session.query(Contact).all()
     return contacts
 
@@ -76,17 +70,29 @@ def say(text):
 
 
 def greet_root():
-    say("Hi, you can say anything, i.e. create or read or udpate.") #todo only once.
+    # say("Hi, you can say anything, i.e. create or read or udpate.") #todo only once.
+    say("Hi, Let us get started") #todo only once.
 
 def prompt_for_phone_number():
     say("Please provide a phone number for the new contact:") # todo: randomize
+    # say("Please provide a phone number")
+    # say("Please provide a number")
+    # say("Provide a number")
+    # say("What is the phone number")
 
 def prompt_for_name():
     say("Please provide a name for the new contact:")
+    # say("Please provide a name:")
+    # say("Please provide a name for the contact:")
+    # say("Provide a name:")
 
 def save_and_exit():
     # todo save to db
     # store the full state
+    say("Bye bye!")
+    # say("Quitting")
+    # say("Our time has come to and end")
+    # say("See you next time")
     sys.exit(0)
 
 def create_success():
