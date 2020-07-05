@@ -1,4 +1,3 @@
-# given a list of lists of regexen indentify which list was chosen by the user given some user input in python.
 import re
 import sys
 from pprint import pprint
@@ -9,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 
-# DB initilzation 
+# Setup ORM withh contacts DB 
 engine = create_engine('sqlite:///./contacts.db', echo=True)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -21,7 +20,7 @@ class Contact(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     number = Column(String)
-    date = Column(String)
+    # date = Column(String)
 
     def __repr__(self):
         return f'{self.name}, {self.number},'
@@ -33,12 +32,6 @@ def today():
     date = datetime.now().replace(microsecond=0).isoformat().replace('T',' ')
     return date
 
-
-
-
-# contact = Contact(name="John Doe", number='555-555-9111', date=date)
-# session.add(contact)
-# session.commit()
 #
 # contact api
 
@@ -50,7 +43,8 @@ contacts = {}
 def add_contact(phone_number,name): # todo: store in sqlite
     global contacts
     # contacts[name] = {'phone_number':phone_number,'name':name}
-    contact = Contact(name=name, number=phone_number, date=today())
+    # contact = Contact(name=name, number=phone_number, date=today())
+    contact = Contact(name=name, number=phone_number)
     session.add(contact)
     session.commit()
 
@@ -59,7 +53,24 @@ def udpate_contact(old_name,new_name,phone_number):
     del contacts[old_name]
     contacts[new_name] = {'phone_number':phone_number,'name':new_name}
 
+def delete_contact(): 
+    global state
+    
+    if 'CONTACT_NAME' in state:
+        contact = session.query(Contact).filter(Contact.name == state['CONTACT_NAME'])
+        contact.delete()
+        say("Contact deleted")
+
+    # https://towardsdatascience.com/sqlalchemy-python-tutorial-79a577141a91
+    # DELETE FROM contacts WHERE name = name_or_number
+    # DELETE FROM contacts WHERE number = name_or_number
+
+    # contact = sesssion.query(Contact).filter(or_(Contact.name == name_or_number, Contact.number == nam_or_number))
+    # print(contact)
+    # contact.delete(synchronize_session=False)
+
 def contact_list():
+    global contacts
     contacts = session.query(Contact).all()
     return contacts
 
@@ -74,19 +85,30 @@ def say(text):
     call(['say',text])
     print(text)
 
-
 def greet_root():
-    say("Hi, you can say anything, i.e. create or read or udpate.") #todo only once.
+    # say("Hi, you can say anything, i.e. create or read or udpate.") #todo only once.
+    say("Hi, Let us get started") #todo only once.
 
 def prompt_for_phone_number():
     say("Please provide a phone number for the new contact:") # todo: randomize
+    # "Please provide a phone number"
+    # "Please provide a number"
+    # "Provide a number"
+    # "What is the phone number"
 
 def prompt_for_name():
     say("Please provide a name for the new contact:")
+    # "Please provide a name:"
+    # "Please provide a name for the contact:"
+    # "Provide a name:"
 
 def save_and_exit():
-    # todo save to db
+    # todo save to de
     # store the full state
+    say("Bye bye!")
+    # "Quitting"
+    # "Our time has come to and end"
+    # "See you next time"
     sys.exit(0)
 
 def create_success():
@@ -133,10 +155,10 @@ def main():
     states['ROOT'] = {'GREET':greet_root}
     states['ROOT']['TRANSITIONS'] = []
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['create','set','add'],'DESTINATION':'CREATE'})
-    states['ROOT']['TRANSITIONS'].append({'REGEXEN':['read', 'show', 'get'],'DESTINATION':'READ'})
+    states['ROOT']['TRANSITIONS'].append({'REGEXEN':['read', 'show', 'get', 'list'],'DESTINATION':'READ'})
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['update', 'replace'],'DESTINATION':'UPDATE'})
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['delete','remove'],'DESTINATION':'DELETE'})
-    states['ROOT']['TRANSITIONS'].append({'REGEXEN':['quit','exit'],'DESTINATION':'EXIT'})
+    states['ROOT']['TRANSITIONS'].append({'REGEXEN':['quit','exit', 'bye', 'goodbye'],'DESTINATION':'EXIT'})
     
     states['EXIT'] = {'GREET':save_and_exit}
     states['EXIT']['TRANSITIONS'] = []
@@ -164,12 +186,23 @@ def main():
     states['READ']['TRANSITIONS'] = []
     states['READ']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'ROOT'})
     
+
     states['UPDATE'] = {}
     states['UPDATE']['TRANSITIONS'] = []
-    states['DELETE'] = {}
+
+    states['DELETE'] = {'GREET':prompt_for_phone_number,'STORE':'CONTACT_PHONE'}
     states['DELETE']['TRANSITIONS'] = []
+    states['DELETE']['TRANSITIONS'].append({'REGEXEN':['^[0-9]+$'],'DESTINATION':'DELETE_ASK_FOR_NAME'})
+    states['DELETE']['TRANSITIONS'].append({'REGEXEN':['[a-zA-Z ]+'],'DESTINATION':'DELETE'})
+    states['DELETE']['TRANSITIONS'].append({'REGEXEN':['cancel'],'DESTINATION':'CANCEL_AND_ROOT'})
 
+    states['DELETE_ASK_FOR_NAME'] = {'GREET':prompt_for_name,'STORE':'CONTACT_NAME'}
+    states['DELETE_ASK_FOR_NAME']['TRANSITIONS'] = []
+    states['DELETE_ASK_FOR_NAME']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'DELETE_CONTACT'})
 
+    states['DELETE_CONTACT'] = {'GREET':delete_contact,'NOPROMPT':1}
+    states['DELETE_CONTACT']['TRANSITIONS'] = []
+    states['DELETE_CONTACT']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'ROOT'})
 
     # this is the main greeter.
     states[state['INTENT']]['GREET']()
