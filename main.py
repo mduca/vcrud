@@ -48,12 +48,16 @@ def add_contact(phone_number,name): # todo: store in sqlite
     session.add(contact)
     session.commit()
 
-def udpate_contact(old_name,new_name,phone_number):
-    global contacts
-    del contacts[old_name]
-    contacts[new_name] = {'phone_number':phone_number,'name':new_name}
+def update_contact():
+    contact = get_contact_by_name()
 
-def delete_contact(): 
+    say("Updating "+ contact.name)
+
+    contact.name = state['NEW_CONTACT_NAME']
+    session.commit()
+    print(contact)
+
+def delete_contact():
     global state
     
     if 'CONTACT_NAME' in state:
@@ -74,11 +78,14 @@ def contact_list():
     contacts = session.query(Contact).all()
     return contacts
 
-def get_contact_by_name(name):
-    global contacts
-    if not (name in contacts):
-        return None
-    return contacts[name]
+def get_contact_by_name():
+    if 'CONTACT_NAME' in state:
+        contacts = session.query(Contact).filter_by(name = state['CONTACT_NAME']).all()
+        if contacts:
+            for contact in contacts:
+                print(contact.name, contact.number)
+                return contact
+    return None
 
 
 def say(text):
@@ -152,6 +159,8 @@ def main():
     global state
     # list of lists
     states = {}
+
+    #ROOT
     states['ROOT'] = {'GREET':greet_root}
     states['ROOT']['TRANSITIONS'] = []
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['create','set','add'],'DESTINATION':'CREATE'})
@@ -160,9 +169,11 @@ def main():
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['delete','remove'],'DESTINATION':'DELETE'})
     states['ROOT']['TRANSITIONS'].append({'REGEXEN':['quit','exit', 'bye', 'goodbye'],'DESTINATION':'EXIT'})
     
+    # EXIT
     states['EXIT'] = {'GREET':save_and_exit}
     states['EXIT']['TRANSITIONS'] = []
 
+    # CREATE
     states['CREATE'] = {'GREET':prompt_for_phone_number,'STORE':'CONTACT_PHONE'}
     states['CREATE']['TRANSITIONS'] = []
     states['CREATE']['TRANSITIONS'].append({'REGEXEN':['^[0-9]+$'],'DESTINATION':'CREATE_ASK_FOR_NAME'})
@@ -177,19 +188,34 @@ def main():
     states['CREATE_SAVE_CONTACT']['TRANSITIONS'] = []
     states['CREATE_SAVE_CONTACT']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'ROOT'})
 
+    # CANCEL
     states['CANCEL_AND_ROOT'] = {'GREET':cancel_and_root,'STORE':'CONTACT_PHONE'}
     states['CANCEL_AND_ROOT']['TRANSITIONS'] = []
     states['CANCEL_AND_ROOT']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'ROOT'})
 
-
+    # READ
     states['READ'] = {'GREET':show_list_of_contacts}
     states['READ']['TRANSITIONS'] = []
     states['READ']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'ROOT'})
     
-
-    states['UPDATE'] = {}
+    # UPDATE
+    states['UPDATE'] = {'GREET':prompt_for_name,'STORE':'CONTACT_NAME'}
     states['UPDATE']['TRANSITIONS'] = []
+    states['UPDATE']['TRANSITIONS'].append({'REGEXEN':['[a-zA-Z ]+'],'DESTINATION':'UPDATE_NEW_NAME'})
+    states['UPDATE']['TRANSITIONS'].append({'REGEXEN':['cancel'],'DESTINATION':'CANCEL_AND_ROOT'})
 
+    states['UPDATE_NEW_NAME'] = {'GREET':get_contact_by_name,'STORE':'NEW_CONTACT_NAME'}
+    states['UPDATE_NEW_NAME']['TRANSITIONS'] = []
+    states['UPDATE_NEW_NAME']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'UPDATE_CONTACT'})
+    states['UPDATE_NEW_NAME']['TRANSITIONS'].append({'REGEXEN':['cancel'],'DESTINATION':'CANCEL_AND_ROOT'})
+
+    states['UPDATE_CONTACT'] = {'GREET':update_contact,'NOPROMPT':1}
+    states['UPDATE_CONTACT']['TRANSITIONS'] = []
+    states['UPDATE_CONTACT']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'ROOT'})
+
+    states['UPDATE']['TRANSITIONS'].append({'REGEXEN':['.*'],'DESTINATION':'ROOT'})
+
+    # DELETE
     states['DELETE'] = {'GREET':prompt_for_phone_number,'STORE':'CONTACT_PHONE'}
     states['DELETE']['TRANSITIONS'] = []
     states['DELETE']['TRANSITIONS'].append({'REGEXEN':['^[0-9]+$'],'DESTINATION':'DELETE_ASK_FOR_NAME'})
