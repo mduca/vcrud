@@ -1,5 +1,9 @@
 import re
 import sys
+import json
+import subprocess
+
+from random import randint
 from pprint import pprint
 from subprocess import call
 from datetime import datetime
@@ -27,6 +31,21 @@ class Contact(Base):
 
     def tovoice(self):
         return f'{self.name}, {self.number},'
+
+class State(Base):
+    __tablename__ = 'STATE'
+
+    id = Column(Integer, primary_key=True)
+    state = Column(String)
+
+    def __repr__(self):
+        return f'{self.id}, {self.state},'
+
+def any(items):
+    length = len(items)
+    random_index = randint(0,length -1)
+    random_item = items[random_index]
+    return random_item
 
 def today():
     date = datetime.now().replace(microsecond=0).isoformat().replace('T',' ')
@@ -87,33 +106,58 @@ def get_contact_by_name():
                 return contact
     return None
 
+def json_state():
+    save_state = State(state=json.dumps(state))
+    return save_state
 
 def say(text):
-    call(['say',text])
     print(text)
+    subprocess.Popen(["say", text])
 
 def greet_root():
-    # say("Hi, you can say anything, i.e. create or read or udpate.") #todo only once.
-    say("Hi, Let us get started") #todo only once.
+    greetings = [
+        "Hi, you can say anything, i.e. create or read or update.",
+        "Hi, Let us get started",
+        "Hi",
+        "Hello",
+        "Welcome",
+        "Hola",
+        "Howdy"
+    ]
+
+    say(any(greetings))
+
+
 
 def prompt_for_phone_number():
-    say("Please provide a phone number for the new contact:") # todo: randomize
-    # "Please provide a phone number"
-    # "Please provide a number"
-    # "Provide a number"
-    # "What is the phone number"
+    number_prompts = [
+        "Please provide a phone number for the a new contact",
+        "Please provide a phone number",
+        "Please provide a number",
+        "Provide a number",
+        "Whats the phone number?",
+        "What number would you like to add"
+    ]
+    say(any(number_prompts))
 
 def prompt_for_name():
-    say("Please provide a name for the new contact:")
-    # "Please provide a name:"
-    # "Please provide a name for the contact:"
-    # "Provide a name:"
+    name_prompts = [
+        "Please provide a name for the new contact:",
+        "Please provide a name:",
+        "Please provide a name for the contact:",
+        "Provide a name:",
+        "What's the contacts name?",
+        "What's the name?",
+        "Name?"
+    ]
+    say(any(name_prompts))
 
 def save_and_exit():
-    # todo save to de
     # store the full state
+    print("State: " + json_state())
     say("Bye bye!")
-    # "Quitting"
+    # "Adios",
+    # "Quitting",
     # "Our time has come to and end"
     # "See you next time"
     sys.exit(0)
