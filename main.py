@@ -82,14 +82,11 @@ def delete_contact():
     if 'CONTACT_NAME' in state:
         contact = session.query(Contact).filter(Contact.name == state['CONTACT_NAME'])
         contact.delete()
+        session.commit()
         say("Contact deleted")
 
     # https://towardsdatascience.com/sqlalchemy-python-tutorial-79a577141a91
-    # DELETE FROM contacts WHERE name = name_or_number
-    # DELETE FROM contacts WHERE number = name_or_number
-
     # contact = sesssion.query(Contact).filter(or_(Contact.name == name_or_number, Contact.number == nam_or_number))
-    # print(contact)
     # contact.delete(synchronize_session=False)
 
 def contact_list():
@@ -106,9 +103,20 @@ def get_contact_by_name():
                 return contact
     return None
 
-def json_state():
+def set_state():
     save_state = State(state=json.dumps(state))
-    return save_state
+    print(save_state)
+    session.add(save_state)
+    session.commit()
+    # return save_state
+
+def get_state():
+    restore_state = session.query(State)
+    if restore_state:
+        print(restore_state)
+        return restore_state
+    
+    return False
 
 def say(text):
     print(text)
@@ -117,7 +125,7 @@ def say(text):
 def greet_root():
     greetings = [
         "Hi, you can say anything, i.e. create or read or update.",
-        "Hi, Let us get started",
+        "Hi, Let's get started",
         "Hi",
         "Hello",
         "Welcome",
@@ -126,8 +134,6 @@ def greet_root():
     ]
 
     say(any(greetings))
-
-
 
 def prompt_for_phone_number():
     number_prompts = [
@@ -154,7 +160,8 @@ def prompt_for_name():
 
 def save_and_exit():
     # store the full state
-    print("State: " + json_state())
+    # print("State: " + json_state().state)
+    set_state()
     say("Bye bye!")
     # "Adios",
     # "Quitting",
