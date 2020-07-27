@@ -33,13 +33,10 @@ def save(recording):
 
 def main():
 
-    print(len(sys.argv))
-
+    # Specify a specific length   
     if len(sys.argv[1]):
-        print("hey it's 2")
         duration = int(sys.argv[1])
     else:
-        print("hey it's 5, wtf")
         duration = 5 # seconds
 
     print(duration)
