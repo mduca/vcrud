@@ -1,10 +1,11 @@
+import sys
 import datetime
 import sounddevice as sd
 from scipy.io import wavfile
 
+
 samplerate = 16000 #Hz
 channels = 1
-duration = 5 # seconds
 
 # sounddevie default values
 sd.default.samplerate = samplerate
@@ -29,7 +30,19 @@ def save(recording):
     filename = 'recording' + time.strftime("%Y%m%d-%I-%M") + '.wav'
     wavfile.write(filename, samplerate, recording)
 
+
 def main():
+
+    print(len(sys.argv))
+
+    if len(sys.argv[1]):
+        print("hey it's 2")
+        duration = int(sys.argv[1])
+    else:
+        print("hey it's 5, wtf")
+        duration = 5 # seconds
+
+    print(duration)
     myrecording = record(duration)
     play(myrecording)
     save(myrecording)
