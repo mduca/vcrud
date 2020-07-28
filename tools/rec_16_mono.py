@@ -10,6 +10,7 @@ channels = 1
 # sounddevie default values
 sd.default.samplerate = samplerate
 sd.default.channels = channels 
+sd.default.dtype = 'int16'
 
 # Record returns the NumPy array for further processing given a time duration in seconds
 def record(duration):
@@ -33,7 +34,7 @@ def save(recording):
 
 def main():
 
-    # Specify a specific length   
+    # Specify a redording length 
     if len(sys.argv[1]):
         duration = int(sys.argv[1])
     else:
