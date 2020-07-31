@@ -1,4 +1,4 @@
-CREATE TABLE CONTACTS (
+CREATE TABLE CONTACT (
   [id] INTEGER PRIMARY KEY, 
   [name] text, 
   [number] integer, 
