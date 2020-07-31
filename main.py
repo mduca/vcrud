@@ -32,11 +32,13 @@ class Contact(Base):
     def tovoice(self):
         return f'{self.name}, {self.number},'
 
+# State class to keep track of state
 class State(Base):
-    __tablename__ = 'STATE'
+    __tablename__ = 'STATE' # DB table in sqlite
 
     id = Column(Integer, primary_key=True)
-    state = Column(String)
+    key = Column(String)
+    value = Column(String)
 
     def __repr__(self):
         return f'{self.id}, {self.state},'
@@ -74,7 +76,6 @@ def update_contact():
 
     contact.name = state['NEW_CONTACT_NAME']
     session.commit()
-    print(contact)
 
 def delete_contact():
     global state
@@ -103,14 +104,13 @@ def get_contact_by_name():
                 return contact
     return None
 
-def set_state():
+def setState():
     save_state = State(state=json.dumps(state))
     print(save_state)
     session.add(save_state)
     session.commit()
-    # return save_state
 
-def get_state():
+def getState():
     restore_state = session.query(State)
     if restore_state:
         print(restore_state)
