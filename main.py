@@ -33,7 +33,7 @@ class Contact(Base):
         return f'{self.name}, {self.number},'
 
 # State class to keep track of state
-class State(Base):
+class StateProperty(Base):
     __tablename__ = 'STATE' # DB table in sqlite
 
     id = Column(Integer, primary_key=True)
