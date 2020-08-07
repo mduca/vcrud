@@ -9,9 +9,10 @@ def run_it(cmd):
     stdout, stderr = process.communicate()
     if stdout:
         print("\t with output: " + stdout.decode("utf-8"))
-        return stdout
+        return stdout.decode("utf-8")
 
 
 if __name__ == "__main__":
     run_it("sox -d -b 16 output.wav channels 1 rate 16k silence 1 0.1 3% 1 3.0 3%")
-    run_it("deepspeech --model ../deepspeech/deepspeech-0.7.4-models.pbmm --scorer ../deepspeech/deepspeech-0.7.4-models.scorer --audio output.wav")
+    stt = run_it("deepspeech --model ../deepspeech/deepspeech-0.7.4-models.pbmm --scorer ../deepspeech/deepspeech-0.7.4-models.scorer --audio output.wav")
+    run_it("say " + stt)
