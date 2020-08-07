@@ -7,7 +7,8 @@ CREATE TABLE CONTACT (
 
 CREATE TABLE STATE (
   [id] INTEGER PRIMARY KEY, 
-  [state] text, 
+  [key] text, 
+  [value] text, 
   [saved_at] TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
