@@ -3,8 +3,8 @@ import sys
 import json
 import subprocess
 
-# My custom lib
-import voice_input
+# Custom lib
+import voice_input 
 
 from random import randint
 from pprint import pprint
@@ -303,7 +303,10 @@ def main():
     
         user_input = 'NOINPUT'
         if do_prompt == 1:
-            user_input = input() # todo noprompt
+            ''' Set a timestamp and get voice input to convert to text '''
+            timestamp = voice_input.get_timestamp() 
+            voice_input.get_user_voice(timestamp) 
+            user_input = voice_input.wav_to_text(timestamp)
 
         if 'STORE' in states[state['INTENT']]:
            state[states[state['INTENT']]['STORE']] = user_input
