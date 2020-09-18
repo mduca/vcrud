@@ -3,6 +3,9 @@ import sys
 import json
 import subprocess
 
+# Custom lib
+import voice_input 
+
 from random import randint
 from pprint import pprint
 from subprocess import call
@@ -13,13 +16,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 
 # Setup ORM withh contacts DB 
-engine = create_engine('sqlite:///./contacts.db', echo=True)
+engine = create_engine('sqlite:///./db/contacts.db', echo=True)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 session = Session()
 
 class Contact(Base):
-    __tablename__ = 'CONTACTS'
+    __tablename__ = 'CONTACT'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -33,7 +36,7 @@ class Contact(Base):
         return f'{self.name}, {self.number},'
 
 # State class to keep track of state
-class State(Base):
+class StateProperty(Base):
     __tablename__ = 'STATE' # DB table in sqlite
 
     id = Column(Integer, primary_key=True)
@@ -118,9 +121,11 @@ def getState():
     
     return False
 
-def say(text):
+def say(text, wait = 0):
     print(text)
     subprocess.Popen(["say", text])
+    if wait == 1:
+        subprocess.Popen.wait()
 
 def greet_root():
     greetings = [
@@ -182,7 +187,7 @@ def create_success():
         del state['CONTACT_NAME']
 
     add_contact(phone_number, name)
-    say("Contact "+name+" created with phone number:" + phone_number)
+    say("Contact "+name+" created with phone number:" + phone_number, 1)
 
 def cancel_and_root():
     global state    
@@ -298,7 +303,10 @@ def main():
     
         user_input = 'NOINPUT'
         if do_prompt == 1:
-            user_input = input() # todo noprompt
+            ''' Set a timestamp and get voice input to convert to text '''
+            timestamp = voice_input.get_timestamp() 
+            voice_input.get_user_voice(timestamp) 
+            user_input = voice_input.wav_to_text(timestamp)
 
         if 'STORE' in states[state['INTENT']]:
            state[states[state['INTENT']]['STORE']] = user_input
